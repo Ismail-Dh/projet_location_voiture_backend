@@ -37,6 +37,7 @@ public class SecurityConfig {
 	            .authorizeHttpRequests(auth -> auth
 	                .requestMatchers("/api/auth/**").permitAll() // Permet l'accès libre aux routes d'authentification
 	                .requestMatchers("/api/cars/**").permitAll()
+	                .requestMatchers("/api/users/**").permitAll()
 	                .anyRequest().authenticated()               // Toutes les autres requêtes nécessitent une authentification
 	               
 	            );
