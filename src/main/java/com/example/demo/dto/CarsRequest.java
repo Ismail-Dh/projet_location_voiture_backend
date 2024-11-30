@@ -15,6 +15,10 @@ private String marque;
 	private Double tarif;
 	
 	private String etat;
+	
+	private String image;
+
+	private String description;
 
 	public String getMarque() {
 		return marque;
@@ -63,5 +67,23 @@ private String marque;
 	public void setEtat(String etat) {
 		this.etat = etat;
 	}
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+	
+public String getDescription() {
+		
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 
 }

@@ -17,5 +17,8 @@ public interface CarsService {
     
     List<CarsDto> getTousCars();
     
+ // Méthode pour récupérer une voiture par ID
+    CarsDto getCarsById(Long id);
+    
 
 }

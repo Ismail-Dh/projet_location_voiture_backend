@@ -27,6 +27,7 @@ public class CarsServiceImpl implements CarsService {
 		car.setEtat(carsRequest.getEtat());
 		car.setTarif(carsRequest.getTarif());
 		car.setType(carsRequest.getType());
+		car.setImage(carsRequest.getImage());
 		Car creerCar = carsRepository.save(car);
 		CarsDto carDto = new CarsDto();
 		carDto.setId(creerCar.getId());
@@ -41,19 +42,11 @@ public class CarsServiceImpl implements CarsService {
         car.setType(carsRequest.getType());
         car.setTarif(carsRequest.getTarif());
         car.setEtat(carsRequest.getEtat());
-
+        car.setImage(carsRequest.getImage());
         Car updatedCar = carsRepository.save(car);
 
-        CarsDto carsDto = new CarsDto();
-        carsDto.setId(updatedCar.getId());
-        carsDto.setMarque(updatedCar.getMarque());
-        carsDto.setModele(updatedCar.getModele());
-        carsDto.setAnnee(updatedCar.getAnnee());
-        carsDto.setType(updatedCar.getType());
-        carsDto.setTarif(updatedCar.getTarif());
-        carsDto.setEtat(updatedCar.getEtat());
-
-        return carsDto;
+        
+        return CarsDto.fromEntity(updatedCar);
     }
 
     @Override
@@ -64,16 +57,15 @@ public class CarsServiceImpl implements CarsService {
     @Override
     public List<CarsDto> getTousCars() {
         return carsRepository.findAll().stream().map(car -> {
-            CarsDto carsDto = new CarsDto();
-            carsDto.setId(car.getId());
-            carsDto.setMarque(car.getMarque());
-            carsDto.setModele(car.getModele());
-            carsDto.setAnnee(car.getAnnee());
-            carsDto.setType(car.getType());
-            carsDto.setTarif(car.getTarif());
-            carsDto.setEtat(car.getEtat());
-            return carsDto;
+            
+            return CarsDto.fromEntity(car);
         }).collect(Collectors.toList());
     }
+	@Override
+	public CarsDto getCarsById(Long id) {
+		  Car car = carsRepository.findById(id)
+	                .orElseThrow(() -> new RuntimeException("Voiture introuvable avec l'ID : " + id));
+	        return CarsDto.fromEntity(car);
+	    }
 
 }

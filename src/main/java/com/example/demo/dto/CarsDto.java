@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import com.example.demo.entity.Car;
+
 import lombok.Data;
 
 @Data
@@ -17,7 +19,10 @@ private Long id;
 	private Double tarif;
 	
 	private String etat;
+	
+	private String image;
 
+	private String description;
 	public CarsDto() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -79,5 +84,34 @@ private Long id;
 		this.etat = etat;
 	}
 	
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+	public String getDescription() {
+		
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public static CarsDto fromEntity(Car car) {
+		CarsDto carsDto = new CarsDto();
+        carsDto.setId(car.getId());
+        carsDto.setMarque(car.getMarque());
+        carsDto.setModele(car.getModele());
+        carsDto.setAnnee(car.getAnnee());
+        carsDto.setType(car.getType());
+        carsDto.setTarif(car.getTarif());
+        carsDto.setEtat(car.getEtat());
+        carsDto.setImage(car.getImage());
+        carsDto.setDescription(car.getDescription());
+		return carsDto;
+	}
 	
 }

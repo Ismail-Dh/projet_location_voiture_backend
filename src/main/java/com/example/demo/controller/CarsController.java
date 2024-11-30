@@ -55,4 +55,8 @@ public class CarsController {
         List<CarsDto> carsList = carsService.getTousCars();
         return ResponseEntity.ok(carsList);
     }
+    @GetMapping("detail/{id}")
+    public CarsDto getCarById(@PathVariable Long id) {
+        return carsService.getCarsById(id);
+    }
 }
