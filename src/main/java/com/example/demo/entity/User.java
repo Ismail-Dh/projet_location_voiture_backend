@@ -1,18 +1,16 @@
 package com.example.demo.entity;
 
-import com.example.demo.enums.UserRole;
 
-import jakarta.persistence.Entity;
+
 import jakarta.persistence.*;
 
-import lombok.Data;
+
 
 @Entity
-@Data
-@Table(name="users")
-public class User {
+@DiscriminatorValue("Client")
+public class User extends Personne{
 	
-	@Id
+	/*@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
@@ -119,7 +117,7 @@ public class User {
 	public User() {
 		super();
 	}
-	
+	*/
 	
 
 }

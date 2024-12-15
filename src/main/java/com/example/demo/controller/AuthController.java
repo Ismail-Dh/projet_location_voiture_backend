@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.dto.AdminDto;
 import com.example.demo.dto.LoginRequest;
+
 import com.example.demo.dto.SignupRequest;
 import com.example.demo.dto.UserDto;
+
 import com.example.demo.services.auth.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,19 @@ public class AuthController {
 		
 	}
 	
+	@PostMapping("/signup/admin")
+	public ResponseEntity<?> signupAdmin(@RequestBody SignupRequest signupRequest){
+		if(authService.hasCustomerWithEmail(signupRequest.getEmail())) {
+			return new ResponseEntity<>("Admin already exit this email",HttpStatus.NOT_ACCEPTABLE);
+		}
+		AdminDto createdCustomerDto = authService.createAdmin(signupRequest);
+		if(createdCustomerDto==null)return new ResponseEntity<>
+		("Admin not created, come again later ",HttpStatus.CREATED);
+		
+		return new ResponseEntity<>(createdCustomerDto,HttpStatus.CREATED);
+		
+	}
+	
 	 @PostMapping("/login")
 	    public ResponseEntity<?> loginCustomer(@RequestBody LoginRequest loginRequest) {
 	        try {
@@ -45,5 +61,16 @@ public class AuthController {
 	        } catch (IllegalArgumentException e) {
 	            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
 	        }
-}}
+}
+	 
+	 @PostMapping("/login1")
+	    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+		 try {
+			 UserDto personneDto = authService.login(loginRequest) ;
+		        return ResponseEntity.ok(personneDto);
+		 } catch (IllegalArgumentException e) {
+	            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+	        }
+	 }
+}
 

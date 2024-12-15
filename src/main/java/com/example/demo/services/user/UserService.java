@@ -14,4 +14,6 @@ public interface UserService {
     List<UserDto> getTousUtilisateurs();
     UserDto modifierMotDePasse(Long id, String nouveauMotDePasse);
     UserDto creerUtilisateurSiInexistant(UserRequest userRequest);
+    UserDto modifierMotDePasseAvecVerification(Long id, String ancienMotDePasse, String nouveauMotDePasse);
+    long getNombreUtilisateurs();
 }

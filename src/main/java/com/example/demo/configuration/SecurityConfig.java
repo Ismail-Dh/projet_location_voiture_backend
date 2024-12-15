@@ -29,15 +29,19 @@ public class SecurityConfig {
     }*/
 	 @Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		/* http.csrf().disable()
+/*		 http.csrf().disable()
     .authorizeRequests()
-    .anyRequest().permitAll(); // Toutes les requêtes sont accessibles sans authentification*/
-	        http
+    .anyRequest().permitAll(); // Toutes les requêtes sont accessibles sans authentification
+	     */ http
 	            .csrf(csrf -> csrf.disable()) // Désactive CSRF (attention en production)
 	            .authorizeHttpRequests(auth -> auth
 	                .requestMatchers("/api/auth/**").permitAll() // Permet l'accès libre aux routes d'authentification
+	               
 	                .requestMatchers("/api/cars/**").permitAll()
 	                .requestMatchers("/api/users/**").permitAll()
+	                .requestMatchers("/api/admin/**").permitAll()
+	                .requestMatchers("/api/reservations/**").permitAll()
+	                .requestMatchers("/api/factures/**").permitAll()
 	                .anyRequest().authenticated()               // Toutes les autres requêtes nécessitent une authentification
 	               
 	            );

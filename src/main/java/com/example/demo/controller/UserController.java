@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dto.UserDto;
@@ -52,6 +53,16 @@ public class UserController {
         UserDto updatedUser = userService.modifierMotDePasse(id, nouveauMotDePasse);
         return ResponseEntity.ok(updatedUser);
     }
-
-
+    @GetMapping("/count")
+    public long getNombreClients() {
+        return userService.getNombreUtilisateurs();
+    }
+    @PutMapping("/utilisateur/{userId}/changer-mot-de-passe")
+    public ResponseEntity<UserDto> changerMotDePasse(
+            @PathVariable Long userId,
+            @RequestParam String ancienMotDePasse,
+            @RequestParam String nouveauMotDePasse) {
+        UserDto utilisateurMisAJour = userService.modifierMotDePasseAvecVerification(userId, ancienMotDePasse, nouveauMotDePasse);
+        return ResponseEntity.ok(utilisateurMisAJour);
+    }
 }

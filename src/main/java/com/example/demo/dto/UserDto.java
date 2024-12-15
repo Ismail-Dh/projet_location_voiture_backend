@@ -1,6 +1,6 @@
 package com.example.demo.dto;
 
-import com.example.demo.enums.UserRole;
+
 
 import lombok.Data;
 @Data
@@ -11,9 +11,10 @@ public class UserDto {
 	private String prenom;
 	private String email;
 	private String numero_tel;
-	private UserRole userRole;
 	private String adresse;
     private String password;
+    
+    private String role;
 	public Long getId() {
 		return id;
 	}
@@ -44,12 +45,7 @@ public class UserDto {
 	public void setNumero_tel(String numero_tel) {
 		this.numero_tel = numero_tel;
 	}
-	public UserRole getUserRole() {
-		return userRole;
-	}
-	public void setUserRole(UserRole userRole) {
-		this.userRole = userRole;
-	}
+	
 	public UserDto() {
 		super();
 	}
@@ -65,6 +61,12 @@ public class UserDto {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public String getRole() {
+		return role;
+	}
+	public void setRole(String role) {
+		this.role = role;
 	}
 	
 

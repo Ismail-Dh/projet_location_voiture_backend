@@ -28,6 +28,7 @@ public class CarsServiceImpl implements CarsService {
 		car.setTarif(carsRequest.getTarif());
 		car.setType(carsRequest.getType());
 		car.setImage(carsRequest.getImage());
+		car.setDescription(carsRequest.getDescription());
 		Car creerCar = carsRepository.save(car);
 		CarsDto carDto = new CarsDto();
 		carDto.setId(creerCar.getId());
@@ -43,6 +44,7 @@ public class CarsServiceImpl implements CarsService {
         car.setTarif(carsRequest.getTarif());
         car.setEtat(carsRequest.getEtat());
         car.setImage(carsRequest.getImage());
+    	car.setDescription(carsRequest.getDescription());
         Car updatedCar = carsRepository.save(car);
 
         
