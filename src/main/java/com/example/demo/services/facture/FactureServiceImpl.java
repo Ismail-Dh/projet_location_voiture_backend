@@ -8,7 +8,6 @@ import com.example.demo.dto.FactureDto;
 import com.example.demo.dto.FactureRequest;
 import com.example.demo.entity.Facture;
 import com.example.demo.entity.Reservation;
-import com.example.demo.repository.CarsRespository;
 import com.example.demo.repository.FactureRepository;
 import com.example.demo.repository.ReservationRepository;
 
@@ -34,7 +33,6 @@ import com.itextpdf.layout.element.Cell;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 
 @Service
@@ -78,7 +76,7 @@ public class FactureServiceImpl implements FactureService {
         facture.setMontant(daysBetween * reservation.getCar().getTarif());
 
         Facture savedFacture = factureRepository.save(facture);
-        reservation.setStatu("Termine");
+        reservation.setStatu("Confirme");
         reservationRepository.save(reservation);
         return convertToDTO(savedFacture);
     }

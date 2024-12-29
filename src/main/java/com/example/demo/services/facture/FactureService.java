@@ -14,6 +14,8 @@ public interface FactureService {
     List<FactureDto> getAllFactures();
     FactureDto getFactureById(long id);
     FactureDto createFacture(FactureRequest factureRequest);
+   // FactureDto createFacture(Long id);
+
     FactureDto updateFacture(long id, FactureDto factureDTO);
     void deleteFacture(long id);
     

@@ -15,6 +15,7 @@ public class ReservationDto {
     private Long id_reservation;
     private Date date_debut;
     private Date date_fin;
+    private Date date_de_reservation;
     private String statu;
     private Car car;    // Objet de la voiture
     private User user;  // Objet de l'utilisateur
@@ -55,6 +56,12 @@ public class ReservationDto {
 	}
 	public void setUser(User user) {
 		this.user = user;
+	}
+	public Date getDate_de_reservation() {
+		return date_de_reservation;
+	}
+	public void setDate_de_reservation(Date date_de_reservation) {
+		this.date_de_reservation = date_de_reservation;
 	}
     
     

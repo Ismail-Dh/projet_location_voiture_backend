@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import jakarta.persistence.Entity;
@@ -28,6 +29,7 @@ public class Reservation {
 	private Date date_debut;
 	private Date date_fin;
 	private String statu;
+	private LocalDate date_de_reservation;
 	public Reservation() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -71,6 +73,15 @@ public class Reservation {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+	public LocalDate getDate_de_reservation() {
+		return date_de_reservation;
+	}
+
+	public void setDate_de_reservation(LocalDate date_de_reservation) {
+		this.date_de_reservation = date_de_reservation;
+	}
+
 		
 	
 }

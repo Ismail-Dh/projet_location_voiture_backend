@@ -15,7 +15,7 @@ public class Facture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id_facture;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_reservation", nullable = false)
     private Reservation reservation;
 

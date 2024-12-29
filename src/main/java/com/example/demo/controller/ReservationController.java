@@ -4,6 +4,7 @@ package com.example.demo.controller;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,21 @@ public class ReservationController {
         ReservationDto updatedReservation = reservationService.modifierReservation(id, reservationRequest);
         return ResponseEntity.ok(updatedReservation);
     }
-
+    @PutMapping("/confirmer/{id}")
+    public ResponseEntity<ReservationDto> confirmerReservation(@PathVariable int id) {
+        ReservationDto updatedReservation = reservationService.confirmerReservation(id);
+        return ResponseEntity.ok(updatedReservation);
+    }
+    
+    @GetMapping("/montant-total/{id}")
+    public ResponseEntity<Double> getMontantTotal(@PathVariable Long id) {
+        try {
+            Double montantTotal = reservationService.montontTotal(id);
+            return ResponseEntity.ok(montantTotal);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
     // Supprimer une réservation par ID
     @DeleteMapping("/supprimer/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable int id) {
@@ -57,5 +72,13 @@ public class ReservationController {
     @GetMapping("/count")
     public long getNombreReservations() {
         return reservationService.getNombreResrvation();
+    }
+    @GetMapping("/countReservationClient/{id}")
+    public long getNombreResrvationDuClient(@PathVariable Long id) {
+        return reservationService.getNombreResrvationDuClient(id);
+    }
+    @GetMapping("/countReservationClientStatu/{id}/{statu}")
+    public long getNombreResrvationDuClientAndstatu(@PathVariable Long id,@PathVariable String statu) {
+        return reservationService.getNombreResrvationDuClientAndStatu(id, statu);
     }
 }
