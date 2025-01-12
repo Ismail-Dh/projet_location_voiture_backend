@@ -11,6 +11,7 @@ public class RetourDto {
 	private long id_retour;
     private Contrat contrat;
     private LocalDate date_retour;
+    private Boolean etat_voitureBoolean;
 	public long getId_retour() {
 		return id_retour;
 	}
@@ -28,6 +29,12 @@ public class RetourDto {
 	}
 	public void setDate_retour(LocalDate date_retour) {
 		this.date_retour = date_retour;
+	}
+	public Boolean getEtat_voitureBoolean() {
+		return etat_voitureBoolean;
+	}
+	public void setEtat_voitureBoolean(Boolean etat_voitureBoolean) {
+		this.etat_voitureBoolean = etat_voitureBoolean;
 	}
     
     

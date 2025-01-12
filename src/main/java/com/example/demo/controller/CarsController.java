@@ -103,4 +103,18 @@ public class CarsController {
     public CarsDto getCarById(@PathVariable Long id) {
         return carsService.getCarsById(id);
     }
+    
+    @GetMapping("/search")
+    public List<CarsDto> searchCars(
+          
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String marque,
+            @RequestParam(required = false) Double tarif
+    ) {
+        return carsService.searchCars(type, marque, tarif);
+    }
+    @GetMapping()
+    public long getNombrecars() {
+        return carsService.getNombreCars();
+    }
 }

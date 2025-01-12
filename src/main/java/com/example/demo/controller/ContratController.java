@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 
 
+
 import java.util.List;
 
 
@@ -55,6 +56,12 @@ public class ContratController {
         contratsService.supprimer(id);
         return ResponseEntity.noContent().build();
     }
+    @PostMapping("stockerSignuature/{id}")
+    public void stokersignuatyre (
+            @PathVariable Long id,
+            @RequestParam("signature") MultipartFile signatureFile)throws Exception{
+    	contratsService.setImage(id,signatureFile);
+    }
  // Endpoint pour télécharger la signature et générer le PDF avec signature
     @PostMapping("/{id}/generate-pdf-with-signature")
     public ResponseEntity<byte[]> generateContratWithSignaturePDF(
@@ -80,23 +87,23 @@ public class ContratController {
                 .body(pdf);
     }
 
-  /*  // Endpoint pour générer simplement le PDF du contrat sans signature
+    // Endpoint pour générer simplement le PDF du contrat sans signature
     @GetMapping("/{id}/generate-pdf")
-    public ResponseEntity<byte[]> generateContratPDF(@PathVariable Long id) throws IOException {
+    public ResponseEntity<byte[]> generateContratPDF(@PathVariable Long id) throws Exception {
         // Récupérer le contrat
-        ContratDao contrat = contratsService.getContratById(id);
+        ContratDao contrat = contratsService.getContratByIdReservation(id);
         if (contrat == null) {
             return ResponseEntity.notFound().build();
         }
 
         // Générer le PDF sans la signature
-        byte[] pdf = contratsService.generateContratPDF(contrat);
+        byte[] pdf = contratsService.generateContratPDFWithSignature(contrat,contrat.getSignatureImage());
 
         // Retourner le PDF généré
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=contrat_" + id + ".pdf")
+                .header("Content-Disposition", "attachment; filename=contrat_" + contrat.getIdContrat() + ".pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdf);
-    }*/
+    }
 
 }

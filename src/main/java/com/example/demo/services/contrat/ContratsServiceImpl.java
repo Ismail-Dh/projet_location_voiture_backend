@@ -1,6 +1,8 @@
 package com.example.demo.services.contrat;
 
 import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -11,6 +13,7 @@ import javax.activation.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.ContratDao;
 import com.example.demo.entity.Contrat;
@@ -34,7 +37,8 @@ import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.layout.element.Image;
 
 import java.io.ByteArrayOutputStream;
-
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 
@@ -48,7 +52,7 @@ public class ContratsServiceImpl implements ContratsService {
     private ReservationRepository reservationRepository;
 
     @Override
-    public List<ContratDao> getAllContrats() {
+   /* public List<ContratDao> getAllContrats() {
         List<Contrat> contrats = contratRepository.findAll();
         List<ContratDao> contratDaos = new ArrayList<>();
 
@@ -60,8 +64,47 @@ public class ContratsServiceImpl implements ContratsService {
         }
 
         return contratDaos;
-    }
+    }*/
+    public List<ContratDao> getAllContrats() {
+        LocalDate today = LocalDate.now();
 
+        // Récupérer tous les contrats
+        List<Contrat> contrats = contratRepository.findAll();
+
+        // Liste pour stocker les ContratDao
+        List<ContratDao> contratDaos = new ArrayList<>();
+
+        for (Contrat contrat : contrats) {
+            // Vérifier les critères
+            if (contrat.getReservation() != null) {
+                String statut = contrat.getReservation().getStatu();
+                LocalDate dateFin = convertirDateEnLocalDate(contrat.getReservation().getDate_fin());
+
+                // Vérifier le statut et si la date actuelle dépasse la date de fin par au moins un jour
+               if (statut.equals("En litige")) {
+                   
+                    ContratDao contratDao = this.convertTDao(contrat);
+                   
+                    contratDaos.add(contratDao);
+                }
+               if(statut.equals("En cours")&&
+                       dateFin != null && ChronoUnit.DAYS.between(dateFin, today) == 1 ) {
+            	   
+            	   ContratDao contratDao = this.convertTDao(contrat);
+                   
+                   contratDaos.add(contratDao);
+               }
+               
+            }
+        }
+
+        return contratDaos;
+    }
+    private LocalDate convertirDateEnLocalDate(Date date) {
+	    return date.toInstant()
+	               .atZone(ZoneId.systemDefault())
+	               .toLocalDate();
+	}
     @Override
     public ContratDao getContratById(Long id) {
         Optional<Contrat> contratOpt = contratRepository.findById(id);
@@ -71,6 +114,7 @@ public class ContratsServiceImpl implements ContratsService {
             contratDao.setIdContrat(contrat.getId());
             contratDao.setReservation(contrat.getReservation());
             contratDao.setEtat(contrat.getEtat());
+            contratDao.setSignatureImage(contrat.getSignatureImage());
             return contratDao;
         }
         return null; 
@@ -237,6 +281,15 @@ public class ContratsServiceImpl implements ContratsService {
 		contratDao.setIdContrat(contrat.getId());
 		contratDao.setReservation(contrat.getReservation());
 		contratDao.setEtat(contrat.getEtat());
+		contratDao.setSignatureImage(contrat.getSignatureImage());
 		return contratDao;
+	}
+
+	@Override
+	public void setImage(Long idcontrat, MultipartFile signatureImage)throws Exception {
+		 Contrat contratOpt = contratRepository.findById(idcontrat).orElseThrow(() -> new RuntimeException("contrat introuvable avec l'ID " + idcontrat));
+		 contratOpt.setSignatureImage(signatureImage.getBytes());
+		 contratRepository.save(contratOpt);
+		
 	}
 }

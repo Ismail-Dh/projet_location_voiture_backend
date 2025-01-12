@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.ExeceptionDto;
 import com.example.demo.dto.ReservationDto;
 import com.example.demo.dto.ReservationRequest;
 import com.example.demo.entity.Car;
@@ -23,6 +24,7 @@ import com.example.demo.repository.UserRespository;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,12 +44,27 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public ReservationDto creerReservation(ReservationRequest reservationRequest) {
-        // Vérifiez si la voiture et l'utilisateur existent
+    	 try {   // Vérifiez si la voiture et l'utilisateur existent
         Car car = carsRepository.findById((long) reservationRequest.getCarId())
                 .orElseThrow(() -> new RuntimeException("Voiture introuvable avec l'ID " + reservationRequest.getCarId()));
         User user = userRepository.findById((long) reservationRequest.getUserId())
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable avec l'ID " + reservationRequest.getUserId()));
+       // LocalDate dateDebut =convertirDateEnLocalDate(reservationRequest.getDate_debut()) ;
+      //  LocalDate dateFin = convertirDateEnLocalDate(reservationRequest.getDate_fin());
 
+        // Vérifiez si la voiture est déjà réservée avec un statut confirmé
+        boolean carReservee = reservationRepository.existsByCarAndStatuAndDatesOverlap(
+                car, "Confirme", reservationRequest.getDate_debut(), reservationRequest.getDate_fin());
+        if (carReservee) {
+        	throw new RuntimeException("La voiture est déjà réservée pour les dates sélectionnées.");
+        }
+
+        // Vérifiez si la voiture est partiellement réservée
+        boolean carPartiellementReservee = reservationRepository.existsByCarAndStatuInAndDatesOverlap(
+                car, Arrays.asList("En attente", "En attente de paiement"),  reservationRequest.getDate_debut(), reservationRequest.getDate_fin());
+        if (carPartiellementReservee) {
+            throw new RuntimeException("La voiture est partiellement réservée pour les dates sélectionnées.");
+        }
         Reservation reservation = new Reservation();
         reservation.setDate_debut(reservationRequest.getDate_debut());
         reservation.setDate_fin(reservationRequest.getDate_fin());
@@ -59,11 +76,16 @@ public class ReservationServiceImpl implements ReservationService {
         Reservation reservationCree = reservationRepository.save(reservation);
 
         return convertirEnDto(reservationCree);
+    	 } catch (RuntimeException e) {
+    	        // Log l'erreur pour le debug
+    	        System.err.println("Erreur lors de la création de la réservation : " + e.getMessage());
+    	        throw new RuntimeException(e.getMessage()); // Relancer ou renvoyer un message clair
+    	    }
     }
 
     @Override
-    public ReservationDto modifierReservation(int id, ReservationRequest reservationRequest) {
-        Reservation reservationExistante = reservationRepository.findById((long) id)
+    public ReservationDto modifierReservation(Long id, ReservationRequest reservationRequest) {
+        Reservation reservationExistante = reservationRepository.findById( id)
                 .orElseThrow(() -> new RuntimeException("Réservation introuvable avec l'ID " + id));
 
        
@@ -91,7 +113,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public ReservationDto getReservationById(int id) {
+    public ReservationDto getReservationById(Long id) {
         Reservation reservation = reservationRepository.findById((long) id)
                 .orElseThrow(() -> new RuntimeException("Réservation introuvable avec l'ID " + id));
         return convertirEnDto(reservation);
@@ -115,7 +137,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public ReservationDto confirmerReservation(int id) {
+	public ReservationDto confirmerReservation(Long id) {
 		 Reservation reservationExistante = reservationRepository.findById((long) id)
 	                .orElseThrow(() -> new RuntimeException("Réservation introuvable avec l'ID " + id));
 
@@ -185,8 +207,16 @@ public class ReservationServiceImpl implements ReservationService {
 	            Car car= reservation.getCar();
 		           car.setEtat("Reserve");
 		           this.carsRepository.save(car); // Mettre à jour l'état de la voiture
+	        }else if (reservation.getStatu().equalsIgnoreCase("En cours")) 
+	                {
+	        	long daysBetween = ChronoUnit.DAYS.between(dateDeFin, LocalDate.now());
+	        	if(daysBetween>1) {
+	            reservation.setStatu("En litige");
+	            Car car= reservation.getCar();
+		           car.setEtat("Reserve");
+		           this.carsRepository.save(car); // Mettre à jour l'état de la voiture
 	        }
-
+	                }
 	        // Sauvegarde les modifications
 	        reservationRepository.save(reservation);
 	    }
@@ -197,5 +227,39 @@ public class ReservationServiceImpl implements ReservationService {
 	    return date.toInstant()
 	               .atZone(ZoneId.systemDefault())
 	               .toLocalDate();
+	}
+
+	@Override
+	public List<ReservationDto> getToutesLesReservationsDuClient(Long id_client) {
+		
+		return reservationRepository.reservationClientId(id_client).stream().map(this::convertirEnDto)
+                .collect(Collectors.toList());
+	}
+
+	@Override
+	public void annulerReservation(Long id) {
+		 Reservation reservationExistante = reservationRepository.findById((long) id)
+	                .orElseThrow(() -> new RuntimeException("Réservation introuvable avec l'ID " + id));
+
+	       
+          if(reservationExistante.getStatu().equals("En attente")) {
+	        reservationExistante.setStatu("Annulee");
+	        reservationRepository.save(reservationExistante);
+	      }else if (reservationExistante.getStatu().equals("En attente de paiement")) {
+	    	  reservationExistante.setStatu("Annulee");
+		        reservationRepository.save(reservationExistante);
+	    	  Contrat contrat=  this.contratRepository.contratByreservationId(reservationExistante.getId_resrvation());
+	            contrat.setEtat("Annulee");
+	            this.contratRepository.save(contrat);
+		}
+          
+          else {
+	    	  reservationExistante.setStatu("Annulee");
+		        reservationRepository.save(reservationExistante);
+	    	  Contrat contrat=  this.contratRepository.contratByreservationId(reservationExistante.getId_resrvation());
+	            contrat.setEtat("Annulee");
+	            this.contratRepository.save(contrat);
+	      }
+		
 	}
 }

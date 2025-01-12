@@ -43,7 +43,7 @@ public class CarsServiceImpl implements CarsService {
         car.setType(carsRequest.getType());
         car.setTarif(carsRequest.getTarif());
         car.setEtat(carsRequest.getEtat());
-        car.setImage(carsRequest.getImage());
+       // car.setImage(carsRequest.getImage());
     	car.setDescription(carsRequest.getDescription());
         Car updatedCar = carsRepository.save(car);
 
@@ -69,5 +69,19 @@ public class CarsServiceImpl implements CarsService {
 	                .orElseThrow(() -> new RuntimeException("Voiture introuvable avec l'ID : " + id));
 	        return CarsDto.fromEntity(car);
 	    }
-
+	@Override
+	public List<CarsDto> searchCars(String type, String marque, Double tarif) {
+		System.out.println(type);
+		System.out.println(marque);
+		System.out.println(tarif);
+	    List<Car> cars = carsRepository.findCarsByFilters(type, marque, tarif);
+	    return cars.stream()
+	               .map(CarsDto::fromEntity)
+	               .collect(Collectors.toList());
+	}
+	@Override
+	public Long getNombreCars() {
+		// TODO Auto-generated method stub
+		return carsRepository.count();
+	}
 }

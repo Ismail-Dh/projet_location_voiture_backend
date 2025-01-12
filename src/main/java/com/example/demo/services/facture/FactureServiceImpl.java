@@ -6,9 +6,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.FactureDto;
 import com.example.demo.dto.FactureRequest;
+import com.example.demo.dto.FactureSuppDto;
+import com.example.demo.entity.Contrat;
 import com.example.demo.entity.Facture;
+import com.example.demo.entity.FactureSupplementaire;
 import com.example.demo.entity.Reservation;
 import com.example.demo.repository.FactureRepository;
+import com.example.demo.repository.FactureSuppRepository;
 import com.example.demo.repository.ReservationRepository;
 
 
@@ -16,6 +20,7 @@ import com.example.demo.repository.ReservationRepository;
 
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,11 +46,13 @@ public class FactureServiceImpl implements FactureService {
     private  FactureRepository factureRepository;
 	@Autowired
     private  ReservationRepository reservationRepository;
-	
+	@Autowired
+    private  FactureSuppRepository factureSuppRepository;
 
-    public FactureServiceImpl(FactureRepository factureRepository, ReservationRepository reservationRepository) {
+    public FactureServiceImpl(FactureRepository factureRepository, ReservationRepository reservationRepository,FactureSuppRepository factureSuppRepository) {
         this.factureRepository = factureRepository;
         this.reservationRepository = reservationRepository;
+        this.factureSuppRepository=factureSuppRepository;
     }
 
     @Override
@@ -58,6 +65,11 @@ public class FactureServiceImpl implements FactureService {
     @Override
     public FactureDto getFactureById(long id) {
         Facture facture = factureRepository.findById(id).orElseThrow(() -> new RuntimeException("Facture not found"));
+        return convertToDTO(facture);
+    }
+    @Override
+    public FactureSuppDto getFactureSuppById(long id) {
+        FactureSupplementaire facture = factureSuppRepository.findById(id).orElseThrow(() -> new RuntimeException("Facture not found"));
         return convertToDTO(facture);
     }
 
@@ -78,6 +90,32 @@ public class FactureServiceImpl implements FactureService {
         Facture savedFacture = factureRepository.save(facture);
         reservation.setStatu("Confirme");
         reservationRepository.save(reservation);
+        return convertToDTO(savedFacture);
+    }
+    
+    @Override
+    public FactureSuppDto createFactureSupplimentaire(Contrat contrat ,Double frait, Double montant,String detail) {
+        Reservation reservation = contrat.getReservation();
+         List<Facture> factures= factureRepository.findAll();
+         FactureSupplementaire facture = new FactureSupplementaire();
+         LocalDate dateFin = reservation.getDate_fin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+         long nb_jours = ChronoUnit.DAYS.between(dateFin,LocalDate.now())-1;
+         System.out.println(nb_jours);
+         System.out.print(dateFin);
+         for(Facture facture1: factures ) {
+        	 if(facture1.getReservation().getId_resrvation().equals(reservation.getId_resrvation())) {
+        		 facture.setFacture(facture1);
+        	 }
+         }
+        
+       Double montantTotale=(nb_jours * frait) + montant;
+        
+         facture.setDate(LocalDate.now());
+         
+         facture.setMontantSupp(montantTotale);
+         facture.setSupplementDetails(detail);
+         FactureSupplementaire savedFacture = factureSuppRepository.save(facture);
+      
         return convertToDTO(savedFacture);
     }
 
@@ -103,6 +141,15 @@ public class FactureServiceImpl implements FactureService {
         factureDTO.setDate_paiement(facture.getDate_paiement());
         factureDTO.setMontant(facture.getMontant());
         factureDTO.setNum_compte(facture.getNum_compte());
+        return factureDTO;
+    }
+    private FactureSuppDto convertToDTO(FactureSupplementaire facture) {
+        FactureSuppDto factureDTO = new FactureSuppDto();
+        factureDTO.setId_facture(facture.getId_facturesup());
+        factureDTO.setFacture(facture.getFacture());
+        factureDTO.setDate(facture.getDate());
+        factureDTO.setMontantSupp(facture.getMontantSupp());
+        factureDTO.setSupplementDetails(facture.getSupplementDetails());
         return factureDTO;
     }
 
@@ -175,7 +222,53 @@ public class FactureServiceImpl implements FactureService {
 
         return baos.toByteArray();
     }
+
+	@Override
+	public List<FactureDto> getAllFacturesClient(Long id) {
+		
+		return factureRepository.getFacturesClient(id).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+	}
 	
+	@Override
+	public byte[] generateFactureSupplimentairePDF(FactureSuppDto paiement) throws IOException {
+	    // Création du flux de sortie pour le PDF
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PdfWriter writer = new PdfWriter(baos);
+	    PdfDocument pdfDocument = new PdfDocument(writer);
+	    Document document = new Document(pdfDocument);
+
+	    // Configuration de la police pour le titre
+	    PdfFont titleFont = PdfFontFactory.createFont(com.itextpdf.io.font.constants.StandardFonts.HELVETICA_BOLD);
+	    Paragraph title = new Paragraph("Facture Supplémentaire")
+	            .setFont(titleFont)
+	            .setFontSize(18)
+	            .setTextAlignment(TextAlignment.CENTER);
+	    document.add(title);
+
+	    // Informations sur le client
+	    document.add(new Paragraph("Client: " + paiement.getFacture().getReservation().getUser().getNom() + " " + paiement.getFacture().getReservation().getUser().getPrenom()));
+	    document.add(new Paragraph("Email: " + paiement.getFacture().getReservation().getUser().getEmail()));
+	    document.add(new Paragraph("Téléphone: " + paiement.getFacture().getReservation().getUser().getNumero_tel()));
+
+	    // Informations sur la voiture
+	    document.add(new Paragraph("Voiture: " + paiement.getFacture().getReservation().getCar().getMarque() + " " +
+	            paiement.getFacture().getReservation().getCar().getModele() + " (" +
+	            paiement.getFacture().getReservation().getCar().getAnnee() + ")"));
+	    document.add(new Paragraph("Type: " + paiement.getFacture().getReservation().getCar().getType()));
+
+	    // Montant supplémentaire (associé à la facture, par exemple pour des réparations)
+	    document.add(new Paragraph("Descriptions: " + paiement.getSupplementDetails()));
+	  
+	        document.add(new Paragraph("Montant Supplémentaire pour Réparations: " + paiement.getMontantSupp() + " MAD"));
+	   
+
+	    // Fermeture du document
+	    document.close();
+
+	    return baos.toByteArray();
+	}
 
 	
 	

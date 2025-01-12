@@ -1,10 +1,12 @@
 package com.example.demo.entity;
 
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -20,6 +22,8 @@ public class Contrat {
 	 private Reservation reservation;
 	 
 	 private String etat;
+	 @Lob
+	    private byte[] signatureImage;
 
 	public Long getId() {
 		return id;
@@ -44,6 +48,18 @@ public class Contrat {
 	public void setEtat(String etat) {
 		this.etat = etat;
 	}
+
+	public byte[] getSignatureImage() {
+		return signatureImage;
+	}
+
+	public void setSignatureImage(byte[] signatureImage) {
+		this.signatureImage = signatureImage;
+	}
+
+	
+
+	
 	 
 	 
 

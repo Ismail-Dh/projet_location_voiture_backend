@@ -24,8 +24,8 @@ public class RetourController {
 	 public List<RetourDto> getAllRetour(){
 		 return retourService.getAllRetour();
 	 }
-	 @PostMapping("/creer/{id}")
-	 public RetourDto ajouterRetour(@PathVariable Long id) {
-		 return retourService.ajouterRetour(id);
+	 @PostMapping("/creer/{id}/{etat}")
+	 public RetourDto ajouterRetour(@PathVariable Long id,@PathVariable Boolean etat) {
+		 return retourService.ajouterRetour(id,etat);
 	 }
 }

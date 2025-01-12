@@ -6,6 +6,7 @@ public class ContratDao {
     private Long idContrat;
     private Reservation reservation;
     private String etat;
+    private byte[] signatureImage;
 	public Long getIdContrat() {
 		return idContrat;
 	}
@@ -23,6 +24,12 @@ public class ContratDao {
 	}
 	public void setEtat(String etat) {
 		this.etat = etat;
+	}
+	public byte[] getSignatureImage() {
+		return signatureImage;
+	}
+	public void setSignatureImage(byte[] signatureImage) {
+		this.signatureImage = signatureImage;
 	}
     
 }

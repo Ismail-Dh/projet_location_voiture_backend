@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.demo.dto.ExeceptionDto;
 import com.example.demo.dto.ReservationDto;
 import com.example.demo.dto.ReservationRequest;
 import com.example.demo.services.reservations.ReservationService;
@@ -22,20 +23,30 @@ public class ReservationController {
     private  ReservationService reservationService;
 
     // Créer une nouvelle réservation
-    @PostMapping("/creer")
+ /*   @PostMapping("/creer")
     public ResponseEntity<ReservationDto> createReservation(@RequestBody ReservationRequest reservationRequest) {
         ReservationDto createdReservation = reservationService.creerReservation(reservationRequest);
         return ResponseEntity.ok(createdReservation);
-    }
+    }*/
+	@PostMapping("/creer")
+	public ResponseEntity<?> createReservation(@RequestBody ReservationRequest reservationRequest) {
+	    try {
+	        ReservationDto createdReservation = reservationService.creerReservation(reservationRequest);
+	        return ResponseEntity.ok(createdReservation);
+	    } catch (RuntimeException e) {
+	        // En cas d'erreur, on renvoie une réponse avec un code d'état 400 (Bad Request)
+	        return ResponseEntity.badRequest().body(new ExeceptionDto(e.getMessage()));
+	    }
+	}
 
     // Modifier une réservation existante
     @PutMapping("/modifier/{id}")
-    public ResponseEntity<ReservationDto> updateReservation(@PathVariable int id, @RequestBody ReservationRequest reservationRequest) {
+    public ResponseEntity<ReservationDto> updateReservation(@PathVariable Long id, @RequestBody ReservationRequest reservationRequest) {
         ReservationDto updatedReservation = reservationService.modifierReservation(id, reservationRequest);
         return ResponseEntity.ok(updatedReservation);
     }
     @PutMapping("/confirmer/{id}")
-    public ResponseEntity<ReservationDto> confirmerReservation(@PathVariable int id) {
+    public ResponseEntity<ReservationDto> confirmerReservation(@PathVariable Long id) {
         ReservationDto updatedReservation = reservationService.confirmerReservation(id);
         return ResponseEntity.ok(updatedReservation);
     }
@@ -55,17 +66,26 @@ public class ReservationController {
         reservationService.supprimerReservation(id);
         return ResponseEntity.noContent().build();
     }
-
+    @PutMapping("/annuler/{id}")
+    public ResponseEntity<Void> AnnulerReservation(@PathVariable Long id) {
+        reservationService.annulerReservation(id);
+        return ResponseEntity.noContent().build();
+    }
     // Obtenir toutes les réservations
     @GetMapping("/toutes")
     public ResponseEntity<List<ReservationDto>> getAllReservations() {
         List<ReservationDto> reservations = reservationService.getToutesLesReservations();
         return ResponseEntity.ok(reservations);
     }
+    @GetMapping("/tout/Client/{id}")
+    public ResponseEntity<List<ReservationDto>> getAllReservationsClient(@PathVariable Long id) {
+        List<ReservationDto> reservations = reservationService.getToutesLesReservationsDuClient(id);
+        return ResponseEntity.ok(reservations);
+    }
 
     // Obtenir une réservation par ID
     @GetMapping("/{id}")
-    public ResponseEntity<ReservationDto> getReservationById(@PathVariable int id) {
+    public ResponseEntity<ReservationDto> getReservationById(@PathVariable Long id) {
         ReservationDto reservation = reservationService.getReservationById(id);
         return ResponseEntity.ok(reservation);
     }

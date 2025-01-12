@@ -3,6 +3,8 @@ package com.example.demo.services.contrat;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.demo.dto.ContratDao;
 
 
@@ -14,4 +16,5 @@ public interface ContratsService {
        void supprimer(Long id);
        byte[] generateContratPDFWithSignature(ContratDao contrat,byte[] signatureImage)throws Exception;
        void sendContratEmail(String recipientEmail, String subject, String body, byte[] contratPdf) throws Exception;
+       void setImage(Long idcontrat, MultipartFile signatureImage)throws Exception;
 }

@@ -14,6 +14,7 @@ public class FactureDto {
     private LocalDate date_paiement;
     private double montant;
     private String num_compte;
+   
 	public long getId_facture() {
 		return id_facture;
 	}
@@ -45,6 +46,7 @@ public class FactureDto {
 	public void setNum_compte(String num_compte) {
 		this.num_compte = num_compte;
 	}
+	
     
     
 }

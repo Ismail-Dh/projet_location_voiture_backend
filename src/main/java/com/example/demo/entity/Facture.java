@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Entity
 @Data
 @Table(name = "facture")
+
 public class Facture {
 
     @Id
@@ -23,7 +24,7 @@ public class Facture {
 
     private double montant;
 
-    @Column(name = "num_compte", nullable = false)
+    @Column(name = "num_compte")
     private String num_compte;
 
 	public long getId_facture() {

@@ -8,6 +8,6 @@ import com.example.demo.dto.RetourDto;
 @Service
 public interface RetourService {
           List<RetourDto> getAllRetour();
-          RetourDto ajouterRetour(Long id_contrat);
+          RetourDto ajouterRetour(Long id_contrat,Boolean etet);
           
 }

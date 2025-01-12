@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.FactureDto;
 import com.example.demo.dto.FactureRequest;
+import com.example.demo.dto.FactureSuppDto;
+import com.example.demo.entity.Contrat;
 @Service
 public interface FactureService {
     List<FactureDto> getAllFactures();
     FactureDto getFactureById(long id);
+    FactureSuppDto getFactureSuppById(long id);
     FactureDto createFacture(FactureRequest factureRequest);
    // FactureDto createFacture(Long id);
 
@@ -21,4 +24,7 @@ public interface FactureService {
     
     double getSommeMontantsFactures();
     byte[] generateFacturePDF( FactureDto paiement)throws IOException;
+    List<FactureDto> getAllFacturesClient(Long id);
+    FactureSuppDto createFactureSupplimentaire(Contrat contrat ,Double frait, Double montant,String detail);
+    byte[] generateFactureSupplimentairePDF(FactureSuppDto paiement) throws IOException;
 }
